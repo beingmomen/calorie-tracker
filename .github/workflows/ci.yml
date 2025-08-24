@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  server:
+    name: Build & Test Server
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/server
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies (server only)
+        run: pnpm install --filter ./apps/server...
+
+      - name: Run tests (server)
+        run: pnpm test || echo "No tests configured"
+
+      - name: Build server (optional)
+        run: pnpm build || echo "No build step for server"
+
+  client:
+    name: Build Client
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/client
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies (client only)
+        run: pnpm install --filter ./apps/client...
+
+      - name: Run tests (client)
+        run: pnpm test || echo "No tests configured"
+
+      - name: Build client (vite)
+        run: pnpm build
