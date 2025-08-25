@@ -15,9 +15,7 @@ const globalErrorHandler = require('./controllers/errorController');
 
 // Main Routers
 const userRouter = require('./routes/userRoutes');
-const categoryRouter = require('./routes/categoryRoutes');
-const sectionRouter = require('./routes/sectionRoutes');
-const usersV2Router = require('./routes/usersV2Routes');
+const recordRouter = require('./routes/recordRoutes');
 
 const app = express();
 
@@ -120,9 +118,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/categories', categoryRouter);
-app.use('/api/v1/sections', sectionRouter);
-app.use('/api/users', usersV2Router);
+app.use('/api/v1/records', recordRouter);
 
 app.post('/api/v1/logout', (req, res) => {
   res.send('Done');

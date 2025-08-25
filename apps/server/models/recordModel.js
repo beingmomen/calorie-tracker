@@ -4,11 +4,10 @@ const counterPlugin = require('./plugins/counterPlugin');
 
 const schema = new mongoose.Schema(
   {
-    name: {
+    meal: {
       type: String,
-      required: [true, 'Name is required'],
+      required: [true, 'Meal is required'],
       trim: true,
-      unique: true,
       index: true
     },
     slug: {
@@ -16,39 +15,30 @@ const schema = new mongoose.Schema(
       index: true
     },
     original_slug: String,
-    description: {
+    content: {
       type: String,
-      required: [true, 'Description is required'],
+      required: [true, 'Content is required'],
       trim: true
     },
-    image: {
-      type: String,
-      required: [false, 'Image is required']
+    calories: {
+      type: Number,
+      required: [true, 'Calories is required']
     },
-    imageCover: {
+    type: {
       type: String,
-      required: [false, 'Image Cover is required']
+      enum: ['pending', 'approved', 'rejected', 'snack'],
+      default: 'pending',
+      required: [false, 'Type is required'],
+      index: true
     },
-    images: {
-      type: [String],
-      required: [false, 'Images are required']
-      // validate: {
-      //   validator: function(val) {
-      //     return val.length > 0 && val.length === 3;
-      //   },
-      //   message: 'Category must have 3 images'
-      // }
+    date: {
+      type: Date,
+      required: [true, 'Date is required']
     },
     createdAt: {
       type: Date,
       default: Date.now,
       select: true,
-      index: true
-    },
-    user: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: [true, 'Category must belong to a user'],
       index: true
     }
   },
@@ -64,27 +54,27 @@ schema.index({ createdAt: -1, name: 1 });
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 schema.pre('save', function generateSlug(next) {
-  this.original_slug = slug(this.name);
+  this.original_slug = slug(this.meal);
   next();
 });
 
 schema.pre('save', function updateSlug(next) {
-  if (this.isModified('name')) {
-    this.slug = slug(this.name);
+  if (this.isModified('meal')) {
+    this.slug = slug(this.meal);
   }
   next();
 });
 
 schema.pre('findOneAndUpdate', function updateSlugOnUpdate(next) {
   const update = this.getUpdate();
-  if (update.name) {
-    update.slug = slug(update.name);
+  if (update.meal) {
+    update.slug = slug(update.meal);
   }
   next();
 });
 
 schema.plugin(counterPlugin);
 
-const Category = mongoose.model('Category', schema);
+const Record = mongoose.model('Record', schema);
 
-module.exports = Category;
+module.exports = Record;

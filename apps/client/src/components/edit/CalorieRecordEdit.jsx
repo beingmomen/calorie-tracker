@@ -1,65 +1,65 @@
-import { useState, useReducer, useEffect, useContext } from "react";
-import AppContext from "../../app-context";
+import { useState, useReducer, useEffect, useContext } from 'react';
+import AppContext from '../../app-context';
 
 const INITIAL_RECORD = {
-  date: { value: "", valid: false },
-  meal: { value: "Breakfast", valid: true },
-  content: { value: "", valid: false },
-  calories: { value: "", valid: false },
-  type: { value: "", valid: false },
+  date: { value: '', valid: false },
+  meal: { value: 'Breakfast', valid: true },
+  content: { value: '', valid: false },
+  calories: { value: '', valid: false },
+  type: { value: '', valid: false }
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "SUBMIT":
+    case 'SUBMIT':
       return INITIAL_RECORD;
-    case "INPUT_CHANGE":
+    case 'INPUT_CHANGE':
       return {
         ...state,
-        [action.key]: { value: action.value, valid: !!action.value },
+        [action.key]: { value: action.value, valid: !!action.value }
       };
 
-    case "INPUT_VALIDATE":
-      if (action.key === "content") {
-        if (action.value === "sport" && Number(state.calories.value) < 0) {
+    case 'INPUT_VALIDATE':
+      if (action.key === 'content') {
+        if (action.value === 'sport' && Number(state.calories.value) < 0) {
           return {
             ...state,
-            calories: { value: state.calories.value, valid: true },
+            calories: { value: state.calories.value, valid: true }
           };
         } else if (
-          action.value !== "sport" &&
+          action.value !== 'sport' &&
           Number(state.calories.value) > 0
         ) {
           return {
             ...state,
-            calories: { value: state.calories.value, valid: true },
+            calories: { value: state.calories.value, valid: true }
           };
         } else {
           return {
             ...state,
-            calories: { value: state.calories.value, valid: false },
+            calories: { value: state.calories.value, valid: false }
           };
         }
       }
 
-      if (action.key === "calories") {
-        if (state.content.value === "sport" && Number(action.value) < 0) {
+      if (action.key === 'calories') {
+        if (state.content.value === 'sport' && Number(action.value) < 0) {
           return {
             ...state,
-            calories: { value: action.value, valid: true },
+            calories: { value: action.value, valid: true }
           };
         } else if (
-          state.content.value !== "sport" &&
+          state.content.value !== 'sport' &&
           Number(action.value) > 0
         ) {
           return {
             ...state,
-            calories: { value: action.value, valid: true },
+            calories: { value: action.value, valid: true }
           };
         } else {
           return {
             ...state,
-            calories: { value: action.value, valid: false },
+            calories: { value: action.value, valid: false }
           };
         }
       }
@@ -72,7 +72,7 @@ const reducer = (state, action) => {
 };
 
 function CalorieRecordEdit(props) {
-  const { totalCalories } = useContext(AppContext);
+  const { totalCalories, errors, success } = useContext(AppContext);
   const [state, dispatch] = useReducer(reducer, INITIAL_RECORD);
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -84,40 +84,50 @@ function CalorieRecordEdit(props) {
     setIsFormValid(isValid);
   }, [date.valid, meal.valid, content.valid, calories.valid, type.valid]);
 
-  const inputChangeHandler = (e) => {
+  const inputChangeHandler = e => {
     const key = e.target.name;
     dispatch({
-      type: "INPUT_CHANGE",
+      type: 'INPUT_CHANGE',
       value: e.target.value,
-      key,
+      key
     });
 
-    if (key === "content" || key === "calories") {
+    if (key === 'content' || key === 'calories') {
       dispatch({
-        type: "INPUT_VALIDATE",
+        type: 'INPUT_VALIDATE',
         value: e.target.value,
-        key,
+        key
       });
     }
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = e => {
     e.preventDefault();
     props.onFormSubmit(
       Object.keys(state).reduce(
         (acc, cur) => ({
           ...acc,
-          [cur]: state[cur].value,
+          [cur]: state[cur].value
         }),
         {}
       )
     );
-    dispatch({ type: "SUBMIT" });
+    dispatch({ type: 'SUBMIT' });
   };
 
   return (
     <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 mt-8">
       <div>{totalCalories}</div>
+      {errors.map(error => (
+        <div className="bg-red-500 p-2 rounded-md" key={error}>
+          <p className="text-white">{error}</p>
+        </div>
+      ))}
+      {success && (
+        <div className="bg-green-500 p-2 rounded-md">
+          <p className="text-white">{success}</p>
+        </div>
+      )}
       <h2 className="text-2xl font-bold text-gray-800 mb-4">
         Add Calorie Record
       </h2>
@@ -136,8 +146,8 @@ function CalorieRecordEdit(props) {
             id="date"
             className={`border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               state.date.valid
-                ? "focus:ring-blue-500"
-                : "focus:ring-red-500 border-red-500"
+                ? 'focus:ring-blue-500'
+                : 'focus:ring-red-500 border-red-500'
             }`}
             value={state.date.value}
             onChange={inputChangeHandler}
@@ -156,8 +166,8 @@ function CalorieRecordEdit(props) {
             name="meal"
             className={`border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               state.meal.valid
-                ? "focus:ring-blue-500"
-                : "focus:ring-red-500 border-red-500"
+                ? 'focus:ring-blue-500'
+                : 'focus:ring-red-500 border-red-500'
             }`}
             value={state.meal.value}
             onChange={inputChangeHandler}
@@ -184,8 +194,8 @@ function CalorieRecordEdit(props) {
             placeholder="What did you eat?"
             className={`border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               state.content.valid
-                ? "focus:ring-blue-500"
-                : "focus:ring-red-500 border-red-500"
+                ? 'focus:ring-blue-500'
+                : 'focus:ring-red-500 border-red-500'
             }`}
             value={state.content.value}
             onChange={inputChangeHandler}
@@ -205,8 +215,8 @@ function CalorieRecordEdit(props) {
             name="calories"
             className={`border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               state.calories.valid
-                ? "focus:ring-blue-500"
-                : "focus:ring-red-500 border-red-500"
+                ? 'focus:ring-blue-500'
+                : 'focus:ring-red-500 border-red-500'
             }`}
             value={state.calories.value}
             onChange={inputChangeHandler}
@@ -225,8 +235,8 @@ function CalorieRecordEdit(props) {
             name="type"
             className={`border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               state.type.valid
-                ? "focus:ring-blue-500"
-                : "focus:ring-red-500 border-red-500"
+                ? 'focus:ring-blue-500'
+                : 'focus:ring-red-500 border-red-500'
             }`}
             value={state.type.value}
             onChange={inputChangeHandler}
@@ -242,8 +252,8 @@ function CalorieRecordEdit(props) {
           type="submit"
           className={
             !isFormValid
-              ? "bg-gray-400 cursor-not-allowed w-full text-white font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              : " w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              ? 'bg-gray-400 cursor-not-allowed w-full text-white font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
+              : ' w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
           }
           disabled={!isFormValid}
         >

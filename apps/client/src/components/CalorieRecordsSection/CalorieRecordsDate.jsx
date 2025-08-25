@@ -1,7 +1,7 @@
-import StyleRecordCell from "../common/StyleRecordCell";
+import StyleRecordCell from '../common/StyleRecordCell';
 
 function CalorieRecordsDate(props) {
-  const month = props.date.toLocaleString("default", { month: "long" });
+  const month = props.date.toLocaleString('default', { month: 'long' });
   const day = props.date.getDate();
   const year = props.date.getFullYear();
 

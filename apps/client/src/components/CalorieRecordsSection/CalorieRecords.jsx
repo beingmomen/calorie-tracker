@@ -1,18 +1,18 @@
-import CalorieRecordsDate from "./CalorieRecordsDate";
-import StyleRecordCell from "../common/StyleRecordCell";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
+import CalorieRecordsDate from './CalorieRecordsDate';
+import StyleRecordCell from '../common/StyleRecordCell';
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
-const TypedCell = styled.li.attrs((props) => ({
+const TypedCell = styled.li.attrs(props => ({
   className: `flex-1 text-center uppercase font-bold ${
-    props.children === "pending"
-      ? "text-orange-500"
-      : props.children === "approved"
-      ? "text-green-500"
-      : props.children === "rejected"
-      ? "text-red-500"
-      : "text-red-500"
-  }`,
+    props.children === 'pending'
+      ? 'text-orange-500'
+      : props.children === 'approved'
+        ? 'text-green-500'
+        : props.children === 'rejected'
+          ? 'text-red-500'
+          : 'text-red-500'
+  }`
 }))``;
 
 function CalorieRecords(props) {
@@ -30,8 +30,8 @@ function CalorieRecords(props) {
         <TypedCell>{props.type}</TypedCell>
         <li className="flex-1 text-center">
           <button
-            className="bg-red-500 text-white px-2 py-1 rounded-md"
-            onClick={() => props.onDelete(props.id)}
+            className="bg-red-500 text-white px-2 py-1 rounded-md cursor-pointer"
+            onClick={e => props.onDelete(e, props.id)}
           >
             Delete
           </button>

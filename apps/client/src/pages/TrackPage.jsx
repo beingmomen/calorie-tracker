@@ -1,47 +1,19 @@
-import RecordList from "../components/CalorieRecordsSection/RecordList";
-import CalorieRecordEdit from "../components/edit/CalorieRecordEdit";
+import axios from 'axios';
+
+import RecordList from '../components/CalorieRecordsSection/RecordList';
+import CalorieRecordEdit from '../components/edit/CalorieRecordEdit';
 // import Counter from "./Counter";
-import { useState, useEffect } from "react";
-import styles from "./TrackPage.module.css";
-import AppContext from "../app-context";
-const INITIAL_RECORDS = [
-  {
-    id: 1,
-    date: new Date(2023, 2, 1),
-    meal: "Breakfast",
-    content: "Eggs",
-    calories: "600",
-    type: "pending",
-  },
-  {
-    id: 2,
-    date: new Date(2023, 2, 2),
-    meal: "Lunch",
-    content: "Chicken Salad",
-    calories: "400",
-    type: "approved",
-  },
-  {
-    id: 3,
-    date: new Date(2023, 2, 3),
-    meal: "Dinner",
-    content: "Steak",
-    calories: "700",
-    type: "rejected",
-  },
-  {
-    id: 4,
-    date: new Date(2023, 2, 4),
-    meal: "Snack",
-    content: "Protein Bar",
-    calories: "200",
-    type: "pending",
-  },
-];
+import { useState, useEffect } from 'react';
+import styles from './TrackPage.module.css';
+import AppContext from '../app-context';
+
+const INITIAL_RECORDS = [];
 
 export function TrackPage() {
   const [records, setRecords] = useState(INITIAL_RECORDS);
   const [totalCalories, setTotalCalories] = useState(0);
+  const [errors, setErrors] = useState([]);
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     const total = records.reduce((acc, cur) => {
@@ -50,33 +22,87 @@ export function TrackPage() {
     setTotalCalories(total);
   }, [records]);
 
-  const getFormRecordHandler = (record) => {
-    const newRecord = {
-      ...record,
-      date: new Date(record.date),
-      id: new Date().getTime(),
-    };
-
-    setRecords((prevRecords) => [...prevRecords, newRecord]);
-  };
-
-  const deleteRecordHandler = (id) => {
-    console.warn("id", id);
-    setRecords((prevRecords) =>
-      prevRecords.filter((record) => record.id !== id)
+  const fetchAllRecords = async () => {
+    const { data } = await axios.get('/api/v1/records');
+    setRecords(
+      data.data.map(record => ({
+        ...record,
+        date: new Date(record.date)
+      }))
     );
   };
 
+  useEffect(() => {
+    fetchAllRecords();
+  }, []);
+
+  const getFormRecordHandler = async record => {
+    try {
+      const newRecord = {
+        ...record,
+        date: new Date(record.date)
+      };
+
+      const { data } = await axios.post('/api/v1/records', newRecord);
+
+      setSuccess(data.message);
+
+      setTimeout(() => {
+        setSuccess('');
+      }, 2000);
+
+      setRecords(prevRecords => [
+        ...prevRecords,
+        { ...data.data.data, date: new Date(data.data.data.date) }
+      ]);
+    } catch (error) {
+      const errors = [];
+
+      const errorData = error.response.data.errors;
+
+      for (const key in errorData) {
+        errorData[key].forEach(element => {
+          errors.push(element);
+        });
+      }
+
+      setErrors(errors);
+
+      setTimeout(() => {
+        setErrors([]);
+      }, 2000 * errors.length);
+    }
+
+    // setRecords(prevRecords => [...prevRecords, newRecord]);
+  };
+
+  const deleteRecordHandler = async (event, id) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const { data } = await axios.delete(`/api/v1/records/${id}`);
+
+    setSuccess(data.message);
+
+    setTimeout(() => {
+      setSuccess('');
+    }, 2000);
+
+    setRecords(prevRecords => prevRecords.filter(record => record.id !== id));
+  };
+
   return (
-    <div className={styles["my-container"]}>
-      <h1 className={styles["h1"]}>Calorie Tracker</h1>
+    <div className={styles['my-container']}>
+      <h1 className={styles['h1']}>Calorie Tracker</h1>
 
       {/* <Counter /> */}
 
-      <div className={styles["my-content"]}>
+      <div className={styles['my-content']}>
         <AppContext.Provider
           value={{
             totalCalories,
+            errors,
+            success
           }}
         >
           <CalorieRecordEdit onFormSubmit={getFormRecordHandler} />

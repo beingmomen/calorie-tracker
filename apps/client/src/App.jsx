@@ -1,31 +1,31 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import {
   LandingPage,
   TrackPage,
   PageLayout,
   ErrorPage,
-  DetailsPage,
-} from "./pages";
+  DetailsPage
+} from './pages';
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <PageLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/",
-        element: <LandingPage />,
+        path: '/',
+        element: <LandingPage />
       },
       {
-        path: "/track",
-        element: <TrackPage />,
+        path: '/track',
+        element: <TrackPage />
       },
       {
-        path: "/track/:id",
-        element: <DetailsPage />,
-      },
-    ],
-  },
+        path: '/track/:id',
+        element: <DetailsPage />
+      }
+    ]
+  }
   // {
   //   path: "*",
   //   element: <ErrorPage />,
